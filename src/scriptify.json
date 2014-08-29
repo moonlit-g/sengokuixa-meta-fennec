@@ -1,0 +1,21 @@
+{
+    "scripts": [
+        {
+            "name": "sengokuixa-meta-fennec",
+            "charset": "UTF-8",
+            "run-at-startup": true,
+            "run-when": "ready",
+            "include": [
+                "http://*.sengokuixa.jp/*"
+            ],
+            "exclude": [
+                "http://h*.sengokuixa.jp/*"
+            ],
+            "paths": [
+                "content/jquery.min.js",
+                "content/sengokuixa-meta-fennec@sengokuixa-meta.user.js"
+            ]
+        }
+    ],
+    "scriptify-version": "0.2.7"
+}
