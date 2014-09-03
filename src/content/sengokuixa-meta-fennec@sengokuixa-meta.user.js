@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           sengokuixa-meta-fennec
 // @description    戦国IXAを変態させるツール for Fennec
-// @version        1.4.3.8
+// @version        1.4.3.9
 // @namespace      sengokuixa-meta
 // @include        http://*.sengokuixa.jp/*
 // @exclude        http://h*.sengokuixa.jp/*
@@ -3988,7 +3988,7 @@ panelUnionSlot: function( $panel ) {
 		});
 
 		html += '<tr><td colspan="3">';
-		if ( slot1.rank < 5 && slot2.rank >= slot1.rank && slot1.lv == 20 && slot2.lv == 20 && slot2.rankupslot2 ) {
+		if ( slot1.rank < 6 && slot2.rank >= slot1.rank && slot1.lv == 20 && slot2.lv == 20 && slot2.rankupslot2 ) {
 			html += '<button class="imc_rankup">ランクアップ</button>';
 		}
 		if ( slot1.skilllvup && slot2.skillslot2 ) {
@@ -6996,6 +6996,7 @@ filterList: [
 	{ title: 'Cost 2',   condition: [ 'cost', 2 ] },
 	{ title: 'Cost 1.5', condition: [ 'cost', 1.5 ] },
 	{ title: 'Cost 1',   condition: [ 'cost', 1 ] },
+	{ title: '限界突破',   condition: [ 'rank', 6 ] },
 	{ title: '★★★★★', condition: [ 'rank', 5 ] },
 	{ title: '★★★★',   condition: [ 'rank', 4 ] },
 	{ title: '★★★',     condition: [ 'rank', 3 ] },
@@ -7014,13 +7015,14 @@ filterList: [
 	{ title: 'HP最大',     condition: [ 'hp', 'max' ] },
 	{ title: 'HP99以下',   condition: [ 'hp', 99, 'lt' ] },
 	{ title: '討伐300',    condition: [ 'battleGage', 300 ] },
+	{ title: '討伐100上',  condition: [ 'battleGage', 100, 'gt' ] },
 	{ title: 'レベルUP',   condition: [ 'lvup', 1 ] },
 	{ title: 'ランクUP',    condition: [ 'rankup', 1 ] },
-	{ title: '序',          condition: [ 'rarity', '序' ] },
-	{ title: '上',          condition: [ 'rarity', '上' ] },
-	{ title: '特',          condition: [ 'rarity', '特' ] },
-	{ title: '極',          condition: [ 'rarity', '極' ] },
 	{ title: '天',          condition: [ 'rarity', '天' ] },
+	{ title: '極',          condition: [ 'rarity', '極' ] },
+	{ title: '特',          condition: [ 'rarity', '特' ] },
+	{ title: '上',          condition: [ 'rarity', '上' ] },
+	{ title: '序',          condition: [ 'rarity', '序' ] },
 ],
 
 //.. sortList
@@ -7040,6 +7042,12 @@ sortList: [
 	{ title: '兵法：昇',    condition: [ 'int', 'asc' ] },
 	{ title: '兵数：降',    condition: [ 'solNum', 'desc' ] },
 	{ title: '兵数：昇',    condition: [ 'solNum', 'asc' ] },
+	{ title: '現兵攻：降',  condition: [ 'tmpAtk', 'desc' ] },
+	{ title: '現兵攻：昇',  condition: [ 'tmpAtk', 'asc' ] },
+	{ title: '現兵防：降',  condition: [ 'tmpDef', 'desc' ] },
+	{ title: '現兵防：昇',  condition: [ 'tmpDef', 'asc' ] },
+	{ title: '防/C：降',  condition: [ 'tmpDefCost', 'desc' ] },
+	{ title: '防/C：昇',  condition: [ 'tmpDefCost', 'asc' ] },
 	{ title: '指揮力：降',  condition: [ 'maxSolNum', 'desc' ] },
 	{ title: '指揮力：昇',  condition: [ 'maxSolNum', 'asc' ] },
 	{ title: '破壊力：降',  condition: [ 'totalDes', 'desc' ] },
@@ -7185,7 +7193,8 @@ checkAssignCard: function( cardlist ) {
 		if ( card.hp != card.maxHp ) { continue; }
 		if ( card.status != Card.WAIT && card.status != Card.DISABLED ) { continue; }
 
-		if ( card.cost <= freecost && card.checkAssign( assignedlist ) ) {
+		// ano=5はコスト消費なし
+		if ( ( card.cost <= freecost || Deck.newano == 5 ) && card.checkAssign( assignedlist ) ) {
 			card.setStatus( Card.WAIT );
 		}
 		else {
@@ -7354,11 +7363,11 @@ filterMenu: function( container, up ) {
 		[ '指定無し', '配置可' ],
  		[ '第一組', '第二組', '第三組', '第四組', '未設定' ],
 		[ 'Cost 4', 'Cost 3.5', 'Cost 3', 'Cost 2.5', 'Cost 2', 'Cost 1.5', 'Cost 1' ],
-		[ '★★★★★', '★★★★', '★★★', '★★', '★', '☆' ],
+		[ '限界突破', '★★★★★', '★★★★', '★★★', '★★', '★', '☆' ],
 		[ 'Lv20', 'Lv19以下', 'Lv1以上', 'Lv0' ],
 		[ '兵数最大', '最大以外', '兵数２以上', '兵数１以上', '兵数１' ],
-		[ 'HP最大', 'HP99以下', '討伐300', 'レベルUP', 'ランクUP' ],
-		[ '序', '上', '特', '極', '天' ]
+		[ 'HP最大', 'HP99以下', '討伐300', '討伐100上', 'レベルUP', 'ランクUP' ],
+		[ '天', '極', '特', '上', '序' ]
 	];
 
 	Deck.createMenu( container, 'imc_filter', Deck.filterList, menulist, '指定無し', up );
@@ -7377,6 +7386,7 @@ sortMenu: function( container, up ) {
 		[ '指定無し' ],
 		[ '総攻：降', '総攻：昇', '総防：降', '総防：昇', '速度：降', '速度：昇' ],
 		[ '攻撃力：降', '攻撃力：昇', '防御力：降', '防御力：昇', '兵法：降', '兵法：昇' ],
+		[ '現兵攻：降', '現兵攻：昇', '現兵防：降', '現兵防：昇', '防/C：降', '防/C：昇', ],
 		[ '兵数：降', '兵数：昇', '指揮力：降', '指揮力：昇', '破壊力：降', '破壊力：昇' ],
 		[ 'コスト：降', 'コスト：昇', 'レア度：降', 'レア度：昇' ],
 		[ '経験値：降', '経験値：昇', 'ランク：降', 'ランク：昇', 'レベル：降', 'レベル：昇' ],
@@ -7690,7 +7700,7 @@ breakUp: function( ano, name ) {
 	.pipe(function( html ) {
 		var $html = $(html),
 			found = $html.find('#ig_unitchoice .now:contains("' + name + '")').length,
-			$a = $html.find('.deck_navi A').first(),
+			$a = $html.find('#btn_area A').last(),
 			source, args, postdata;
 
 		if ( !found ) { return $.Deferred().reject( ol ); }
@@ -7741,8 +7751,8 @@ breakUpAll: function( villageName ) {
 
 			let jqXHR = arguments[ i ][ 2 ],
 				$html = $( jqXHR.responseText ),
-				name  = $html.find('.ig_deck_unitdata_assign').text().trim(),
-				$a    = $html.find('.deck_navi A').first(),
+				name  = $html.find('#deck_info #unit_assign+td').text().trim(),
+				$a    = $html.find('#btn_area A').last(),
 				source, args, postdata, unitname;
 
 			if ( villageName && villageName != name ) { continue; }
@@ -9299,7 +9309,7 @@ loadUnit: function( ano ) {
 
 		//デッキ関係の情報保存
 		unit = new Unit( $html.find('#assign_form') );
-		array = $html.find('#ig_deckcost SPAN.ig_deckcostdata').text().match(/(\d+\.?\d?)\/(\d+)/);
+		array = $html.find('.deckcost SPAN').text().match(/(\d+\.?\d?)\/(\d+)/);
 		newano = 5 - $html.find('#ig_unitchoice LI:contains("[---新規部隊を作成---]")').length;
 
 		Deck.tabList = $html.find('#ig_unitchoice LI').map(function() {
@@ -9360,7 +9370,7 @@ loadCard: function( brigade ) {
 			pool = {}, deck_cost, ano, lastPage;
 
 		//デッキ関係の情報保存
-		deck_cost = $html.find('#ig_deckcost SPAN.ig_deckcostdata').text().match(/(\d+\.?\d?)\/(\d+)/);
+		deck_cost = $html.find('.deckcost SPAN').text().match(/(\d+\.?\d?)\/(\d+)/);
 		Deck.maxCost = deck_cost[ 2 ].toFloat();
 		Deck.useCost = deck_cost[ 1 ].toFloat();
 		Deck.newano = 5 - $html.find('#ig_unitchoice LI:contains("[---新規部隊を作成---]")').length;
@@ -9652,14 +9662,20 @@ var Unit = function( $form, type ) {
 
 	type = ( type ) ? type : 'Mini';
 
-	if ( $form && $form.find('#howto_butai_hensei').length == 0 ) {
-		var villagename = $form.find('.ig_deck_unitdata_assign').text().trim(),
-			condition = $form.find('.ig_deck_unitdata_condition').text().replace('帰還する', '').trim(),
-			source = $form.find('.deck_navi A').first().attr('onClick') || '',
+	if ( $form && $form.find('#howto_butai_hensei div.title_reinforce').length > 0 ) {
+		ano = 5;
+	}
+	else if ( $form && $form.find('#howto_butai_hensei #select_village').length == 0 ) {
+		var villagename = $form.find('#deck_info #unit_assign+td').text().trim(),
+			condition = $form.find('#deck_info tr:eq(1) > td').text().replace('帰還する', '').trim(),
+			source = $form.find('#btn_area A').last().attr('onClick') || '',
 			$li, args;
 
 		$li = $form.find('#ig_unitchoice .now');
 		ano = $form.find('#ig_unitchoice LI').index( $li );
+		if( ano < 0 ) {
+			ano = ( $form.find('#ig_unitchoice_reinforce LI.now').length > 0 ) ? 5: -1;
+		}
 
 		village = Util.getVillageByName( villagename );
 		if ( !village ) { village = { name: villagename }; }
@@ -9668,7 +9684,7 @@ var Unit = function( $form, type ) {
 		unit_id = args[ 1 ];
 		leader_id = args[ 2 ];
 
-		$form.find('#id_deck_card1, #id_deck_card2, #id_deck_card3, #id_deck_card4').each(function() {
+		$form.parent().parent().find('#id_deck_card1, #id_deck_card2, #id_deck_card3, #id_deck_card4').each(function() {
 			var $this = $(this),
 				card;
 
@@ -9797,9 +9813,11 @@ addCard: function( card ) {
 		return false;
 	}
 
+	if ( this.ano != 5 ) {
 	if ( this.cost + card.cost > Deck.freeCost ) {
 		Display.alert('デッキコストが足りません。');
 		return false;
+	}
 	}
 
 	if ( !card.checkAssign( list ) ) {
@@ -9825,7 +9843,7 @@ removeCard: function( card ) {
 //.. assignCard
 assignCard: function( ano ) {
 	var unit = this,
-		village_id = unit.village.id || '',
+		village_id = ( unit.village ) ? unit.village.id : '',
 		unit_id = unit.unitId || '',
 		assignlist = unit.assignList.concat(),
 		withdraw = unit.withdraw.concat();
@@ -9835,7 +9853,7 @@ assignCard: function( ano ) {
 		village_id = '';
 		ano = unit.ano;
 	}
-	else if ( ano >= 5 ) {
+	else if ( ano >= 6 ) {
 		//新規
 		Display.alert('これ以上部隊を作成できません。');
 		return $.Deferred().reject( [] );
@@ -9890,12 +9908,11 @@ assignCard: function( ano ) {
 		return $.post( '/card/deck.php', postData )
 		.pipe(function( html ) {
 			var $html = $(html),
-				text = $html.find('#ig_deck_unititle P').text(),
+				text = $html.find('#us_name').text(),
 				name = ( text.match(/\[(.+)\]/) || [,''] )[ 1 ],
-				//unit_id = $html.find('#set_assign_id').val(),
-				// href = $html.find('#ig_deck_unititle A').attr('href') || '',
-				href = $html.find('#ig_deckunitdetail A[href*="unit_assign_id"]').attr('href') || '',
-				unit_id = href.match(/unit_assign_id=(\d+)/)[1],
+				source = $html.find('#btn_area A').last().attr('onClick') || '',
+				args = source.match(/confirmUnregist\('(\d+)', '(\d+)'/) || [],
+				unit_id = args[ 1 ],
 				$li = $html.find('#ig_unitchoice LI'),
 				idx, newidx;
 
@@ -10138,6 +10155,7 @@ solName: '', solType: null, atk: 0, def: 0, int: 0, commands: {}, skillList: [],
 command: '', totalAtk: 0, totalDef: 0, totalDes: 0,
 job: '', exp: 0, gounit: '0', recoveryTime: 0,
 sex: 'm', slot2: '', slot3: '',
+tmpAtk: 0, tmpDef: 0, tmpDefCost: 0,
 
 //.. analyze
 analyze: function( element ) {
@@ -10391,6 +10409,13 @@ power: function() {
 	this.totalDef = ( data.defend * this.solNum + this.def ) * mod / 100;
 	//破壊力
 	this.totalDes = ( data.destroy * this.solNum );
+
+	//現兵種による最大攻撃力
+	this.tmpAtk = ( data.attack * this.maxSolNum + this.atk ) * mod / 100;
+	//現兵種による最大防御力
+	this.tmpDef = ( data.defend * this.maxSolNum + this.def ) * mod / 100;
+	//現兵種によるコス比防御力
+	this.tmpDefCost = this.tmpDef / this.cost;
 },
 
 //.. layouter
@@ -11062,7 +11087,7 @@ useMaterial: function() {
 
 //.. canRankup
 canRankup: function() {
-	return ( this.lv === 20 && this.rank < 5 );
+	return ( this.lv === 20 && this.rank < 6 );
 },
 
 //.. canSkillLvup
@@ -11384,7 +11409,7 @@ loadUnit: function() {
 
 	for( var i = 0, len = list.length; i < len; i++ ) {
 		let base = list[ i ],
-			basename = ( base.mode == '加待' ) ? base.target : base.base;
+			basename = ( base.mode == '加待' ) ? base.target : ( base.base ) ? base.base: '加勢専用';
 
 		if ( !result[ basename ] ) { result[ basename ] = []; }
 		result[ basename ].push([ base.arrival, base.name, base.mode, i, base.ex, base.ey, base.ec ]);
@@ -11556,6 +11581,8 @@ contextmenu: function() {
 			.always(function( ol ) {
 				Util.getUnitStatus();
 				if ( ol && ol.close ) { ol.close(); }
+				if ( location.pathname == '/facility/unit_status.php' ||
+					 location.pathname == '/card/deck.php' ) { location.reload(); }
 			});
 		};
 	}
@@ -12186,6 +12213,7 @@ createPulldownMenu: function() {
 		base_href[base] = href.replace(/page=.*$/, 'page=');
 	});
 
+menu.push({ title:'内政', action: $('#gnavi .gMenu01 > A').attr('href') });
 	menu.push({ title: '【一括兵士訓練】', action: Display.dialogTraining });
 	// 訓練前に退避させるなら↓を有効に
 	//menu.push({ title: '【一括兵士訓練】', action: function() {
@@ -12218,6 +12246,7 @@ createPulldownMenu: function() {
 
 	//部隊用メニュー
 	createMenu($('#gnavi .gMenu02'), [
+{ title:'部隊編成', action: $('#gnavi .gMenu02 > A').attr('href') },
 		{ title: '簡易兵士編成', action: '/facility/set_unit_list.php?show_num=100' },
 		{ title: '待機兵士一覧', action: '/facility/unit_list.php' },
 		{ title: '全部隊状況', action: '/facility/unit_status.php?dmo=all' },
@@ -12238,6 +12267,7 @@ createPulldownMenu: function() {
 
 	//秘境用メニュー
 	createMenu($('#gnavi .gMenu04'), [
+{ title:'秘境', action: $('#gnavi .gMenu04 > A').attr('href') },
 		{ title: '修験渓谷(城:3h)', action: function() { Append.goDungeon( 1 ); } },
 		{ title: '修験樹海(城:6h)', action: function() { Append.goDungeon( 2 ); } },
 		{ title: '絶壁の祠(銅:3h)', action: function() { Append.goDungeon( 3 ); } },
@@ -12248,6 +12278,7 @@ createPulldownMenu: function() {
 	
 	//合戦用メニュー
 	createMenu($('#gnavi .gMenu05'), [
+{ title:'合戦', action: $('#gnavi .gMenu05 > A').attr('href') },
 		{ title: '全国地図', action: '/country/all.php' },
 		{ title: '合戦状況', action: '/war/war_situation.php' },
 		{ title: '合戦格付表', action: '/war/war_ranking.php' },
@@ -12259,10 +12290,11 @@ createPulldownMenu: function() {
 
 	//同盟用メニュー
 	createMenu($('#gnavi .gMenu07'), [
+{ title:'同盟', action: $('#gnavi .gMenu07 > A').attr('href') },
 		{ title: '同盟チャット', action: '/alliance/chat_view.php?pager_select=100' },
 		{ title: '同盟掲示板', action: '/bbs/topic_view.php' },
 		( Env.chapter >= 4 ) ? { title: '同盟金山', action: '/alliance/alliance_gold_mine.php' } : {},
-		{ title: '同盟情報', action: $('#gnavi .gnavi07 > A').attr('href') },
+		{ title: '同盟情報', action: $('#gnavi .gMenu07 > A').attr('href') },
 		{ title: '同盟貢物', action: '/alliance/level.php' },
 		{ title: '同盟管理', action: '/alliance/manage.php' },
 		{ title: '同盟募集', action: '/alliance/invite.php' }
@@ -12270,6 +12302,7 @@ createPulldownMenu: function() {
 
 	//格付用メニュー
 	createMenu($('#gnavi .gMenu08'), [
+{ title:'格付', action: $('#gnavi .gMenu08 > A').attr('href') },
 		{ title: '国別格付', action: '/user/ranking.php?m=' },
 		{ title: '全体格付', action: '/user/ranking.php?m=&c=0' },
 		{ title: '天下勢力', action: '/country/country_ranking.php' },
@@ -12278,6 +12311,7 @@ createPulldownMenu: function() {
 
 	//クエスト用メニュー（その他用）
 	createMenu($('#gnavi .gMenu06'), [
+{ title:'クエスト', action: $('#gnavi .gMenu06 > A').attr('href') },
 		{ title: 'プレゼントボックス', action: '/user/present.php' },
 		{ title: '戦国くじ', action: '/senkuji/senkuji.php' },
 //		{ title: 'スペシャル戦国くじ', action: '/senkuji/senkuji.php?ex=1' },
@@ -12516,7 +12550,6 @@ baseMap: function() {
 		}
 	)
 	.contextMenu(function() {
-console.log( 'contextmenu');
 		var { type, name, x, y, c } = $(this).data(),
 			user = $('.profile TD > .para strong').text().trim(),
 			coord = x + ',' + y,
@@ -12820,7 +12853,6 @@ layouter: function() {
 	}
 
 	 $('#mapOverlayMap > AREA').contextMenu( this.contextmenu, true );
-	// $('#mapOverlayMap > AREA').removeAttr('href').click( this.contextmenu, true );
 },
 
 //. iconLv
@@ -14074,19 +14106,27 @@ commandButton: function() {
 		$('.select_act').find('INPUT[value=' + type + ']').attr('checked', 'true');
 
 		if ( $target.hasClass('imc_quick') ) {
-			Page.post( href, {
+			// 共通POSTパラメータ
+			let postData = {
+				btn_send: true,
+				card_id: 204,
+				radio_move_type: type,
+				show_beat_bandit_flg: '',
+				unit_assign_card_id: '',
+				unit_select: unit,
 				village_name: '',
 				village_x_value: x_value,
 				village_y_value: y_value,
-				unit_assign_card_id: '',
-				radio_move_type: type,
-				show_beat_bandit_flg: '',
-				unit_select: unit,
 				x: '',
 				y: '',
-				card_id: 204,
-				btn_send: 'true'
-			})
+			};
+			// 加勢専用部隊の追加パラメータ
+			if( $this.parent().parent().find('.waitingunittitle_reinforce').length > 0 ) {
+				postData['country_id'] = $('INPUT[name="country_id"]').val();
+				postData['target_country_id'] = $('INPUT[name="target_country_id"]').val();
+			}
+
+			Page.post( href, postData )
 			.pipe(function( html ) {
 				var $html = $(html),
 					text;
@@ -15494,7 +15534,7 @@ style: '' +
 '.ig_deck_unitdata_allcost { width: 40px; display: inline-block; }' +
 
 /* 全部隊解散ボタン用 */
-'#imi_unregist_all { position: absolute; top: 53px; left: 260px; cursor: pointer; }' +
+'#imi_unregist_all { cursor: pointer; }' +
 
 /* 小カード用 */
 '.ig_deck_smallcardtitle { height: 17px; margin-bottom: 3px; }' +
@@ -15603,12 +15643,14 @@ style: '' +
 main: function() {
 	//デッキ関係の情報保存
 	var unit_list = $('#ig_unitchoice LI'),
-		pool = {}, ano, condition, array;
+		pool = {}, ano, array;
 
 	//追加の場合、現在選択されているano
 	ano = unit_list.index( unit_list.filter('.now').first() );
-	condition = $('.ig_deck_unitdata_condition').text().trim();
-	array = $('#ig_deckcost').find('SPAN.ig_deckcostdata').text().match(/(\d+\.?\d?)\/(\d+)/);
+	if( ano < 0 ) {
+		if( $('#ig_unitchoice_reinforce LI').filter('.now').length > 0 ) { ano = 5; }
+	}
+	array = $('#normal_unit_state_head .deckcost').find('SPAN').text().match(/(\d+\.?\d?)\/(\d+)/);
 
 	var unit = new Unit( $('#assign_form'), 'UnitSmall' );
 	Deck.setup( array[ 2 ].toFloat(), array[ 1 ].toFloat(), ano, unit );
@@ -15708,21 +15750,37 @@ layouter: function() {
 	var self = this;
 
 	//ヘッダメニュー部
-	$('#ig_deckcost').appendTo('#ig_deckheadmenubox');
 	$('#ig_deckmenu, #ig_cardreverse').remove();
 
 	//全部隊解散ボタン
 	var len = $('#ig_unitchoice LI').not(':contains("[---新規部隊を作成---]")').length;
 	if ( len > 0 ) {
 		$('<img />').attr({ id: 'imi_unregist_all', title: '全部隊解散', src: Data.images.all_breakup })
-		.appendTo('#ig_deckheadmenubox')
+		.appendTo('#deck_header')
 		.click( this.unregistAll );
 	}
 
+	// タイトルとサブメニュー
+	$('#ig_deckheadmenubox').css('height', '55px');
+	// 経験値アップ非表示
+	$('#ig_keikenup').hide();
+//	// @todo 経験値アップ期間はどこかに表示
+//	$('.ig_deckkeikenuptime').text();
+//	
+//	// コストアップ非表示
+//	$('#deck_cost_add_area').hide();
+	// 全部隊解散ボタンの配置変更に伴う再配置
+	$('#deck_header').css({'margin-top':'-13px;', 'width':'759px'});
+	$('#normal_unit_state_head').css( {'padding-left': '9px', 'width': '259px' } );
 	// デッキのボタン配置変更
-	var $btn_area = $('.deck_navi');
+	var $btn_area = $('#btn_area');
 	// 国移動非表示
 	$btn_area.find('a[href*="country_move.php"]').hide();
+	// 精鋭登録移動
+	$btn_area.find('a[onclick^="registElite"]').css({ 'float': 'right', 'margin': '0px 6px 2px 0px' }).appendTo('#deck_header');
+	// 兵編成、解散の右寄せ
+	$btn_area.css({'float':'right', 'width':'auto'});
+
 	//仮想デッキ用
 	var html = '' +
 	'<div id="imi_bottom_container">' +
@@ -15889,7 +15947,7 @@ villageSelecter: function() {
 	}
 
 	if ( $('#select_village').length == 0 ) {
-		$('.ig_deck_unitdata_assign').clone().appendTo('#imi_village_info');
+		$('#deck_info #unit_assign+td').clone().appendTo('#imi_village_info');
 	}
 	else {
 		$('#select_village').clone().attr('id', 'imi_select_village')
