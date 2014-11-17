@@ -8,9 +8,7 @@
             "include": [
                 "http://*.sengokuixa.jp/*"
             ],
-            "exclude": [
-                "http://h*.sengokuixa.jp/*"
-            ],
+            "exclude": [],
             "paths": [
                 "content/jquery.min.js",
                 "content/sengokuixa-meta-fennec@sengokuixa-meta.user.js"
