@@ -1,9 +1,10 @@
 // ==UserScript==
 // @name           sengokuixa-meta-fennec
 // @description    戦国IXAを変態させるツール for Fennec
-// @version        1.4.4.6
+// @version        1.4.4.10
 // @namespace      sengokuixa-meta
 // @include        http://*.sengokuixa.jp/*
+// @exclude        http://h*.sengokuixa.jp/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
 // @website        https://github.com/moonlit-g/sengokuixa-meta-fennec
 // @updateURL      https://raw.githubusercontent.com/moonlit-g/sengokuixa-meta-fennec/master/sengokuixa-meta.meta.js
@@ -4650,7 +4651,7 @@ style: '' +
 /* 募集・チャット用 */
 '#commentBody TD { height: 13px; }' +
 '#commentBody #chatComment TABLE TD.al { width: 105px; }' +
-'#commentBody #chatComment TABLE TD.al A { width: 105px; }' +
+'#commentBody #chatComment TABLE TD.al A { width: 100px; }' +
 '#commentBody #chatComment TABLE TD.msg > SPAN { width: 235px; }' +
 '.imc_coord { display: inline !important; cursor: pointer; font-weight: bold; }' +
 'SPAN.imc_coord:hover { background-color: #f9dea1 !important; }' +
@@ -4976,7 +4977,7 @@ compass: [
 ],
 
 //. mapsize
-mapsize: [ 0, 180, 180, 180, 180, 150, 150, 170, 170 ][ Env.chapter ] || 150,
+mapsize: [ 0, 180, 180, 180, 180, 150, 150, 170, 170, 170 ][ Env.chapter ] || 150,
 
 //. fortresses
 fortresses: (function() {
@@ -4996,7 +4997,7 @@ fortresses: (function() {
 		[108,108], [132, 84], [108,132], [132,108], [132,132]
 	]];
 
-	return [ [], data[0], data[0], data[0], data[0], data[1], data[1], data[0], data[0] ][ Env.chapter ] || [];
+	return [ [], data[0], data[0], data[0], data[0], data[1], data[1], data[0], data[0], data[0] ][ Env.chapter ] || [];
 })(),
 
 //. doublegen
@@ -5012,7 +5013,7 @@ doublegen: (function() {
 		]
 	];
 
-	return [ [], data[0], data[0], data[0], data[0], data[1], data[1], data[0], data[0] ][ Env.chapter ] || [];
+	return [ [], data[0], data[0], data[0], data[0], data[1], data[1], data[0], data[0], data[0] ][ Env.chapter ] || [];
 })(),
 
 //. countries
@@ -5035,6 +5036,8 @@ countries: (function() {
 		['dummy', '明智家', '真田家', '鈴木家', '上杉家', '徳川家', '毛利家', '伊達家', '北条家', '長宗我部家', '島津家', '豊臣家', '最上家'],
 		//第８章
 		['dummy', '黒田家', '真田家', '宇喜多家', '上杉家', '徳川家', '毛利家', '伊達家', '加藤家', '福島家', '島津家', '豊臣家', '石田家'],
+		//第９章
+		['dummy', '織田家', '雑賀家', '武田家', '上杉家', '徳川家', '毛利家', '浅井家', '北条家', '長宗我部家', '佐竹家', '大友家', '最上家'],
 	][ Env.chapter ] || [];
 })(),
 
@@ -5197,7 +5200,7 @@ getNpcPower: function() {
 		'8-33342': { '鬼': 905, '天狗': 455 }
 	}];
 
-	data = [ {}, data[0], data[0], data[1], data[1], data[2], data[2], data[2], data[2] ][ Env.chapter ] || {};
+	data = [ {}, data[0], data[0], data[1], data[1], data[2], data[2], data[2], data[2], data[2] ][ Env.chapter ] || {};
 
 	if ( Env.chapter <= 4 ) {
 		Data.npcPower = data;
@@ -12567,7 +12570,7 @@ createCoordLink: function() {
 		pointReg = /-?\d{1,3}/g,
 		point, html;
 
-	$('#commentBox')
+	$('#commentBox,#commentBox2')
 	.on('update', function() {
 		$('#commentBody TD.msg > SPAN').each(function() {
 			var $this = $(this),
@@ -12909,6 +12912,9 @@ execute: function() {}
 //■ /world/select_world
 Page.registerAction( 'world', 'select_world', {
 
+style: '' +
+'.infoTable { min-height: 0px !important; }',
+
 //. main
 main: function() {
 	$('A[href^="/world/"]').click( this.serverSelected );
@@ -12949,6 +12955,9 @@ serverSelected: function() {
 	world = ( $this.attr('href').match(/wd=((\S+\d{2,3}))/) || [,''] )[ 1 ];
 	season = ( $server.find('IMG:last').attr('src').match(/flag_.(\d{2})/) || [,''] )[ 1 ];
 	chapter = ( $server.children('DIV').attr('class').match(/(?:main|sub)server_.(\d)/) || [,''] )[ 1 ];
+
+	// いいのかな...(問題が出るまではこのままの予定)
+	chapter = chapter.toInt() + 6;
 
 	if ( world ) {
 		document.cookie = world + '_st=' + time + '; domain=.sengokuixa.jp; path=/;';
@@ -13803,6 +13812,7 @@ style: '' +
 'TR.imc_facility TD { text-align: center; }' +
 'TR.imc_facility TD ~ TD { border-left: solid 1px #fff; }' +
 'BUTTON { position: relative; top: 1px; }' +
+'.ig_tilesection_innerborder_high_speed DIV.ig_tilesection_unit_info { left: 0px; width: 100%; }' +
 /* 市用 */
 '.table_tile_market TD IMG { border: solid 2px black; border-radius: 2px; padding: 2px; margin-right: 5px; cursor: pointer; }' +
 '.table_tile_market TD IMG.imc_selected { border-color: #f80; background-color: #860; }' +
@@ -13893,6 +13903,8 @@ training: function( name ) {
 
 		//兵種の説明
 		$this.find('.ig_tile_explain').hide();
+		// 訓練タイプ
+		$this.find('.create_unit_type_title').remove();
 
 		//現在の兵士数表示位置変更
 		text = $this.find('DIV.ig_tilesection_iconarea > P').remove().text() || '';
@@ -13905,17 +13917,19 @@ training: function( name ) {
 		$close = $('<span class="imc_training_button"></span>');
 		$close.click(function() {
 			var $this = $(this),
-				$container = $this.closest('.ig_tilesection_innerborder');
+				$container = $this.closest('.ig_tilesection_innerborder_high_speed');
 
 			if ( $this.hasClass('is_open') ) {
 				$this.removeClass('is_open').addClass('is_close');
 				$container.find('.ig_tilesection_iconarea').hide();
+				$container.find('.ig_tilesection_detailarea DIV').hide();
 				$container.find('.ig_tilesection_detailarea TABLE').hide();
 				storage.set( key, true );
 			}
 			else {
 				$this.addClass('is_open').removeClass('is_close');
 				$container.find('.ig_tilesection_iconarea').show();
+				$container.find('.ig_tilesection_detailarea DIV').show();
 				$container.find('.ig_tilesection_detailarea TABLE').show();
 				storage.remove( key );
 			}
@@ -13926,6 +13940,7 @@ training: function( name ) {
 		if ( close ) {
 			$close.addClass('is_close');
 			$this.find('.ig_tilesection_iconarea').hide();
+			$this.find('.ig_tilesection_detailarea DIV').hide();
 			$this.find('.ig_tilesection_detailarea TABLE').hide();
 		}
 		else {
@@ -13992,20 +14007,22 @@ trainingPulldown: function( $div ) {
 
 	$div.each(function() {
 		var $this = $(this),
-			$table = $this.find('TABLE').eq( 1 ),
+			$tables = $this.find('TABLE').slice( 1 ),
 			name = $this.find('H3 B').text().slice(1, -1),
-			data = Soldier.getByName( name ),
-			$tr, $select;
+			data = Soldier.getByName( name );
+
+		$tables.each( function( idx, elm ) {
+			var $tr, $select;
 
 		//各拠点の施設表示
-		$tr = $table.find('TR.noborder');
+			$tr = $(this).find('TR.noborder');
 		$tr.removeClass('noborder');
 		$tr.find('TH').first().remove();
 		$tr.find('TD').first().remove();
 		$tr.find('TD').attr('colspan', 3);
 
 		//資源不足等で訓練できない場合はプルダウン化処理をしない
-		var $input = $this.find('INPUT[type="text"]');
+			var $input = $(this).find('INPUT[type="text"]');
 		if ( $input.length == 0 ) { return; }
 
 		html = '（分割回数：<select id="create_count_' + data.type + '">' +
@@ -14023,16 +14040,16 @@ trainingPulldown: function( $div ) {
 		'　<button>複数拠点で訓練する</button>）';
 
 		$tr.find('FORM').append( html );
-		$table
+			$(this)
 		.append('<tr><th>拠点</th><th width="70">LV</th>' +
 			'<th width="120"><img alt="訓練する人数" src="' + Env.externalFilePath + '/img/tile/icon_training_num.png"></th>' +
 			'<th width="120"><img alt="訓練にかかる時間" src="' + Env.externalFilePath + '/img/tile/icon_training_time.png"></th>' +
 			'</tr>'
 		)
-		.append('<tbody id="imi_training_' + data.type + '"></tbody>');
+			.append('<tbody id="imi_training' + idx + '_' + data.type + '"></tbody>');
 
 		//必要資源取得（金山効果は込）
-		$tr = $table.find('TR').eq( 0 );
+			$tr = $(this).find('TR').eq( 0 );
 		materials = [
 			$tr.find('.icon_wood').text().match(/(\d+)/)[ 1 ].toInt(),
 			$tr.find('.icon_cotton').text().match(/(\d+)/)[ 1 ].toInt(),
@@ -14078,6 +14095,7 @@ trainingPulldown: function( $div ) {
 
 		$select.data({ type: data.type, materials: materials })
 		.change( self.trainingDivide ).trigger('change');
+	});
 	});
 },
 
@@ -17340,9 +17358,58 @@ dialogFavoriteEdit: function() {
 
 	options = {
 		title: '検索条件編集',
-		width: 584,
+		width: 584, height: 505, top: 30,
 		content: $content,
 		buttons: {
+			'インポート': function() {
+				var storage = MetaStorage('FAVORITE_TRADE'),
+					tlist   = storage.data;
+
+				$('<input/>').attr('type','file')
+				.on( 'change', function( eo ) {
+					var file   = $(this)[0].files[0],
+						reader = new FileReader();
+
+					reader.onload = function( eo ) {
+						var jso = JSON.parse( reader.result );
+						// 元のデータに追加
+						$.extend( tlist, jso );
+
+						// 完了したら保存
+						storage.clear();
+						storage.begin();
+						storage.data = tlist;
+						storage.commit();
+						Display.info('保存しました');
+						$('#imi_trade_list').trigger('update');
+					};
+					
+					reader.readAsText( file );
+				})
+				.click();
+			},
+			'エクスポート': function() {
+				var storage = MetaStorage('FAVORITE_TRADE'),
+					tlist   = storage.data,
+					blob    = new Blob([JSON.stringify( tlist, null, '\t')], {type:'application/json'}),
+					objURL  = window.URL.createObjectURL(blob),
+					filename = ( 'imt_yymmddhhmi.json' ).replace( /yymmddhhmi/, function( str ) {
+						var now = new Date();
+						return now.getFullYear().toString().substr( -2 ) +
+							   ( '00' + ( now.getMonth() + 1 ) ).substr( -2 ) +
+							   ( '00' + now.getDate() ).substr( -2 ) +
+							   ( '00' + now.getHours() ).substr( -2 ) +
+							   ( '00' + now.getMinutes() ).substr( -2 );
+					});
+
+				var $download = $('<a/>').attr('href', objURL).attr('download', filename);
+				// jQo.click()やjQo.trigger('click')ではAタグに反応してくれない...
+				var e = document.createEvent('MouseEvents');
+				e.initEvent('click', true, true );
+				$download[0].dispatchEvent( e );
+				// 消すタイミングがねぇ
+				// window.URL.revokeObjectURL(objURL);
+			},
 			'保存': function() {
 				storage.clear();
 				storage.begin();
@@ -17729,6 +17796,17 @@ changeTitle: function() {
 	if ( Env.world ) {
 		$('TITLE').text( '【' + Env.world + '】' + $('TITLE').text().replace(/出品/, '出品中') );
 	}
+},
+
+});
+
+//■ /card/bid_list
+Page.registerAction( 'card', 'bid_list', {
+
+//. main
+main: function() {
+	// 共通レイアウタ
+	Trade.layouter();
 },
 
 });
@@ -19664,11 +19742,12 @@ Page.registerAction( 'message', 'inbox', {
 style: '' +
 /* 受信箱 */
 '#ig_deckheadmenubox.normal { height: 55px; margin-bottom: 0px; }' +
-'#ig_deckmenu { width: 710px; padding: 0px; position: static; margin: 0px auto; color: black; }' +
-'#ig_deckmenu UL.secondmenu { width: 100%; padding: 0px; }' +
-'#ig_deckmenu LI { margin: 2px 0px; padding: 0px 8px; }' +
-'#ig_deckmenu LI.textmenu { margin: 7px 0px; }' +
-'.common_box3bottom { padding: 0px 15px 15px 12px; }' +
+// '.common_box3bottom { padding: 0px 15px 15px 12px; }' +
+'UL.statMenu { width: 710px; padding: 0px; position: static; margin: 0px auto; color: black; }' +
+'UL.statMenu LI { margin: 2px 0px; padding: 0px 8px; }' +
+'UL.statMenu LI.textmenu { margin: 7px 0px; }' +
+'UL.statMenu LI:not(.textmenu)  { float: right; border-right: none; padding: 0px 4px; }' +
+'UL.statMenu LI button { font-size: 12px; }' +
 '#imi_list { width: 710px; height: 210px; margin: 0px auto; margin-bottom: 10px; overflow-y: scroll; }' +
 '#imi_list .imc_selected { background-color: #f9dea1; }' +
 '#imi_list TABLE { position: relative; }' +
@@ -19687,9 +19766,9 @@ layouter: function() {
 	var $table, $menu;
 
 	//プロフィール等リンク・全件表示ボタン・未読のみ表示ボタン削除
-	$('#ig_deckmenu UL').not('.secondmenu').remove();
-	$('.common_box3bottom > P').remove();
-	$('#ig_deckmenu').removeAttr('class').prependTo('FORM');
+	$('.statMenu:not(.no_b)').prependTo('.ig_decksection_innermid');
+	$('#ig_deckmenu').remove();
+	$('FORM[name=message_select]').remove();
 
 	//テーブル変更
 	$table = $('TABLE.common_table1').wrap('<div id="imi_list" />');
@@ -19708,19 +19787,22 @@ layouter: function() {
 	//詳細をajaxで取得する
 	$table.find('A[href^="detail.php"]').click( this.getDetail );
 
+	// 削除用フォームで囲むように調整
+	$('FORM[name=message]').prependTo('.ig_decksection_innermid').prepend($('.statMenu'));
+
 	//ページャーを上に移動
-	$('.common_box3bottom > .pager').insertBefore('#imi_list');
+	$('.pager').insertAfter('.statMenu');
 
 	//各種ボタン
-	$menu = $('#ig_deckmenu .secondmenu');
+	$menu = $('.statMenu');
 	$menu.find('LI').addClass('textmenu');
 
 	$('FORM').find('P INPUT').appendTo( $menu )
-	.wrap('<LI style="float: right; border-right: none;" />');
+	.wrap('<LI/>');
 
 	$('<button key="落札">取引結果を選択</button>').appendTo( $menu )
 	.click( this.selectReport )
-	.wrap('<LI style="float: right; border-right: none; padding-right: 0px;" />');
+	.wrap('<LI/>');
 },
 
 //. getDetail
